@@ -21,12 +21,15 @@ RETRY_WAIT_TIME         = 120
 def main():
     load_environment_variables()
     while True:
-        tunnels = get_ngrok_tunnels()
-        if len(tunnels.tunnels) >= EXPECTED_TUNNEL_COUNT:
-            break
+        try:
+            tunnels = get_ngrok_tunnels()
+            if len(tunnels.tunnels) >= EXPECTED_TUNNEL_COUNT:
+                mail_body = stringify_tunnel_info(tunnels)
+                send_mail("Ngrok Tunnels Update", mail_body)
+                break
+        except:
+            pass
         time.sleep(RETRY_WAIT_TIME)
-    mail_body = stringify_tunnel_info(tunnels)
-    send_mail("Ngrok Tunnels Update", mail_body)
 
 
 def send_mail(subject, content):
